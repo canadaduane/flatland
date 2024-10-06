@@ -80,6 +80,6 @@ public class Flatland {
         flatlandFrame.setVisible(true);
         flatlandFrame.requestFocusInWindow();
         flatlandInstance.flatlandCanvas.requestFocus();
-        flatlandFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        flatlandFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     }
 }

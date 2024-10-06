@@ -7,8 +7,8 @@ import javax.swing.*;
 
 class FlatlandCanvas extends JPanel {
 
-    static final int WIDTH = 640;
-    static final int HEIGHT = 480;
+    static final int WIDTH = 1200;
+    static final int HEIGHT = 800;
     float LIGHT_SPEED = 15;
     boolean[] keys = new boolean[4];
     boolean fog = true;
