@@ -2,6 +2,7 @@ import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
 import java.util.ArrayList;
+import java.lang.Math;
 
 class FlatlandCanvas extends Canvas
 {
@@ -35,6 +36,12 @@ class FlatlandCanvas extends Canvas
       addKeyListener( new KeyListener() {
          public void keyPressed( KeyEvent e )
          {
+            if( e.getKeyCode() == KeyEvent.VK_SPACE ) {
+               //control.shape.pushPoint( 0, 0, -50 );
+               //control.shape.pushPoint( 1, 0, 50 );
+               //control.shape.pushPoint( 2, -50, 0 );
+               System.out.println( "space" );
+            }
             switch( e.getKeyCode() )
             {
                case KeyEvent.VK_UP:
@@ -87,10 +94,10 @@ class FlatlandCanvas extends Canvas
    public void moveAllObjects()
    {
       // Keys control one particular Figure in Flatland
-      if( keys[ 0 ] ) control.push( 3, 90 );
-      if( keys[ 1 ] ) control.push( 3, 180 );
-      if( keys[ 2 ] ) control.push( 3, 0 );
-      if( keys[ 3 ] ) control.push( 3, 270 );
+      if( keys[ 0 ] ) control.push( 2, Math.PI / 2 );
+      if( keys[ 1 ] ) control.push( 2, Math.PI );
+      if( keys[ 2 ] ) control.push( 2, 0 );
+      if( keys[ 3 ] ) control.push( 2, Math.PI * 3 / 2 );
    
       Object[] listOfObjects = (Object[])objects.toArray();
       FlatlandObject flObj;
@@ -126,20 +133,20 @@ class FlatlandCanvas extends Canvas
       
       return obj;
    }
-   
-   public FlatlandObject addObject( double x, double y, String lbl )
+
+   public Figure addFigure( double x, double y, int sides )
    {
-      FlatlandObject obj = new FlatlandObject( x, y, lbl );
-      objects.add( obj );
-      
-      return obj;
-   }
-   
-   public Figure addFigure( double x, double y, int sides, boolean regular )
-   {
-      Figure fig = new Figure( x, y, sides, regular );
+      Figure fig = new Figure( x, y, sides );
       objects.add( fig );
       
       return fig;
+   }
+
+   public House addHouse( double x, double y )
+   {
+      House house = new House( x, y );
+      objects.add( house );
+      
+      return house;
    }
 }

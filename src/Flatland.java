@@ -15,13 +15,19 @@ public class Flatland
    public Flatland()
    {
       flatland = new FlatlandCanvas();
-      //flatland.addObject( 0, 0, "Origin" );
-      Figure triangle = flatland.addFigure( -200, 50, 3, true );
-      flatland.setControl( triangle );
-      flatland.addFigure( 100, 90, 4, true );
-      flatland.addFigure( 0, -140, 5, true );
-      flatland.addFigure( 300, -20, 2, true );
-      flatland.addFigure( 170, 20, 18, true );
+      //FlatlandObject origin = flatland.addObject( 0, 0 );
+      //origin.setLabel( "Origin" );
+      Figure aSquare = flatland.addFigure( 0, 0, 4 );
+      flatland.setControl( aSquare );
+      flatland.addHouse( 40, 0 );
+      flatland.addFigure( -168, 25, 5 );
+      flatland.addFigure( -135, 70, 5 );
+      flatland.addFigure( -90, 110, 5 );
+      flatland.addFigure( -30, 150, 5 );
+      flatland.addFigure( -30, -140, 6 );
+      flatland.addFigure( -100, -140, 6 );
+      flatland.addFigure( 300, -20, 2 );
+//      flatland.addFigure( 170, 20, 18 );
       
       //flatland.requestFocus();
       
