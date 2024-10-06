@@ -9,7 +9,7 @@ class FlatlandCanvas extends JPanel {
 
     static final int WIDTH = 1200;
     static final int HEIGHT = 800;
-    float LIGHT_SPEED = 15;
+    float LIGHT_SPEED = 0;
     boolean[] keys = new boolean[4];
     boolean fog = true;
     boolean useColor = false;

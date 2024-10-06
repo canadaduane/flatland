@@ -98,7 +98,7 @@ class FlatlandPanel extends JPanel {
         );
         worldPanel.add(chkColor);
 
-        JCheckBox chkLorentz = new JCheckBox("Lorentz Contraction on/off", true);
+        JCheckBox chkLorentz = new JCheckBox("Lorentz Contraction on/off", false);
         chkLorentz.addActionListener(
             new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
