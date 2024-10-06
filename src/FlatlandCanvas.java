@@ -142,6 +142,14 @@ class FlatlandCanvas extends Canvas
       return fig;
    }
 
+   public Tree addTree( double x, double y )
+   {
+      Tree tree = new Tree( x, y );
+      objects.add( tree );
+      
+      return tree;
+   }
+
    public House addHouse( double x, double y )
    {
       House house = new House( x, y );

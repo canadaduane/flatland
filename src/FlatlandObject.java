@@ -103,7 +103,7 @@ class FlatlandObject
    protected int sides;
    protected Corner[] points;
    protected Segment[] lines;
-   private Point2D.Double center;
+   protected Point2D.Double center;
    
    public void setSides( int s )
    {
@@ -131,6 +131,12 @@ class FlatlandObject
       init( x, y, numberOfSides );
       makeRegular( DEFAULT_RADIUS );
    }
+
+   public FlatlandObject( double x, double y, int numberOfSides, double rad )
+   {
+      init( x, y, numberOfSides );
+      makeRegular( rad );
+   }
    
    public FlatlandObject( double x, double y, int numberOfSides, boolean regular )
    {
@@ -148,17 +154,6 @@ class FlatlandObject
       label = null;
    }
 
-   public void makeIrregular( Point2D.Double[] list )
-   {
-      setSides( list.length );
-      for( int i = 0; i < list.length; i++ )
-      {
-         points[ i ] = new Corner( list[ i ] );
-      }
-      
-      connectCorners();
-   }
-
    public void connectCorners()
    {
       int j = 1;
@@ -172,6 +167,19 @@ class FlatlandObject
          if( j >= sides )
             j = 0;
       }
+   }
+   
+   public void makeIrregular( Point2D.Double[] list )
+   {
+      setSides( list.length );
+      for( int i = 0; i < list.length; i++ )
+      {
+         points[ i ] = new Corner( list[ i ] );
+         points[ i ].x += center.x;
+         points[ i ].y += center.y;
+      }
+      
+      connectCorners();
    }
    
    public void makeRegular( double radius )
@@ -202,6 +210,35 @@ class FlatlandObject
       return true;  
    }
 
+   public Point2D.Double intersect( double Px1, double Py1, double Px2, double Py2,
+                                    double Qx1, double Qy1, double Qx2, double Qy2 )
+   {
+      double Qm, Pm, Qb, Pb;
+      double Qrise, Qrun, Prise, Prun;
+      Qrise = Qy2 - Qy1;
+      Prise = Py2 - Py1;
+      Qrun = Qx2 - Qx1;
+      Prun = Px2 - Px1;
+      
+      Qm = Qrise / Qrun;      // slope of segment Q
+      Pm = Prise / Prun;      // slope of segment P
+      
+      Qb = Qy1 - Qm * Qx1;    // y-intercept of segment Q
+      Pb = Py1 - Pm * Px1;    // y-intercept of segment P
+      
+      // Calculate point of intersection
+      double y = ( Qm * ( Qb - Pb ) ) / ( Pm - Qm );
+      double x = ( y - Pb ) / Pm;
+      
+      if( x >= Px1 && x < Px2 && x >= Qx1 && x <= Qx2 &&
+          y >= Py1 && y < Py2 && y >= Qy1 && y <= Qy2 )
+      {
+         return new Point2D.Double( x, y );
+      } else {
+         return null;
+      }
+   }
+
    public void paint( Graphics g )
    {
       if( inScreen() )
@@ -223,7 +260,7 @@ class FlatlandObject
             y2 = -(int)(points[ j ]).getRelativeY();
    
             g.drawLine( x1, y1, x2, y2 );
-            g.drawLine( cx, cy, cx, cy );
+            // g.drawLine( cx, cy, cx, cy );
             j++;
             if( j >= sides ) j = 0;
          }
@@ -295,6 +332,19 @@ class FlatlandObject
       points[ p ].y += y;
    }
 */   
+
+   public void moveCenter( double x, double y )
+   {
+      for( int i = 0; i < sides; i++ )
+      {
+         points[ i ].x += ( x - center.x );
+         points[ i ].y += ( y - center.y );
+      }
+      
+      center.x = x;
+      center.y = y;
+   }
+   
    public Point2D.Double recalculateCenter()
    {
       // Calculate the average x and y position, or "center" of
@@ -343,14 +393,136 @@ class FlatlandObject
    }
 }
 
+class Eye extends FlatlandObject
+{
+   public Eye( double x, double y )
+   {
+      // Regular triangle with radius of 3
+      super( x, y, 5, 3.0 );
+   }
+
+   public void paint( Graphics g )
+   {
+      super.paint( g );
+      
+   }   
+}
+
 class Figure extends FlatlandObject
 {
+   Eye myEye;
    
    public Figure( double x, double y, int sides )
    {
       super( x, y, sides );
+      myEye = new Eye( x, y );
    }
-   
+
+   public void paint( Graphics g )
+   {
+      super.paint( g );
+      myEye.paint( g );
+   }
+
+   public void move()
+   {
+      super.move();
+      myEye.moveCenter( points[ 0 ].x, points[ 0 ].y );
+   }   
+}
+
+class Tree extends FlatlandObject
+{
+   static Point2D.Double[] shape = {
+   	new Point2D.Double( 3, -153),
+    	new Point2D.Double( 61, -159),
+    	new Point2D.Double( 86, -170),
+    	new Point2D.Double( 93, -178),
+    	new Point2D.Double( 87, -159),
+    	new Point2D.Double( 51, -139),
+    	new Point2D.Double( 29, -105),
+    	new Point2D.Double( 25, -47),
+    	new Point2D.Double( 18, 23),
+    	new Point2D.Double( 18, 54),
+    	new Point2D.Double( 21, 80),
+    	new Point2D.Double( 43, 94),
+    	new Point2D.Double( 67, 100),
+    	new Point2D.Double( 75, 92),
+    	new Point2D.Double( 76, 82),
+    	new Point2D.Double( 68, 78),
+    	new Point2D.Double( 65, 71),
+    	new Point2D.Double( 68, 62),
+    	new Point2D.Double( 74, 59),
+    	new Point2D.Double( 82, 59),
+    	new Point2D.Double( 89, 65),
+    	new Point2D.Double( 91, 73),
+    	new Point2D.Double( 84, 79),
+    	new Point2D.Double( 78, 83),
+    	new Point2D.Double( 77, 93),
+    	new Point2D.Double( 83, 93),
+    	new Point2D.Double( 103, 95),
+    	new Point2D.Double( 124, 106),
+    	new Point2D.Double( 135, 121),
+    	new Point2D.Double( 135, 113),
+    	new Point2D.Double( 133, 110),
+    	new Point2D.Double( 129, 105),
+    	new Point2D.Double( 129, 96),
+    	new Point2D.Double( 132, 90),
+    	new Point2D.Double( 137, 90),
+    	new Point2D.Double( 146, 89),
+    	new Point2D.Double( 151, 93),
+    	new Point2D.Double( 153, 100),
+    	new Point2D.Double( 148, 108),
+    	new Point2D.Double( 142, 112),
+    	new Point2D.Double( 138, 113),
+    	new Point2D.Double( 138, 121),
+    	new Point2D.Double( 144, 134),
+    	new Point2D.Double( 149, 164),
+    	new Point2D.Double( 134, 196),
+    	new Point2D.Double( 101, 218),
+    	new Point2D.Double( 43, 218),
+    	new Point2D.Double( -66, 239),
+    	new Point2D.Double( -124, 210),
+    	new Point2D.Double( -149, 168),
+    	new Point2D.Double( -135, 114),
+    	new Point2D.Double( -111, 96),
+    	new Point2D.Double( -90, 87),
+    	new Point2D.Double( -89, 77),
+    	new Point2D.Double( -94, 74),
+    	new Point2D.Double( -98, 68),
+    	new Point2D.Double( -97, 59),
+    	new Point2D.Double( -90, 53),
+    	new Point2D.Double( -80, 52),
+    	new Point2D.Double( -70, 61),
+    	new Point2D.Double( -71, 70),
+    	new Point2D.Double( -79, 78),
+    	new Point2D.Double( -87, 79),
+    	new Point2D.Double( -87, 88),
+    	new Point2D.Double( -65, 84),
+    	new Point2D.Double( -39, 79),
+    	new Point2D.Double( -29, 65),
+    	new Point2D.Double( -25, 36),
+    	new Point2D.Double( -25, 8),
+    	new Point2D.Double( -29, -23),
+    	new Point2D.Double( -33, -73),
+    	new Point2D.Double( -41, -99),
+    	new Point2D.Double( -48, -117),
+    	new Point2D.Double( -62, -127),
+    	new Point2D.Double( -86, -139),
+    	new Point2D.Double( -102, -140),
+    	new Point2D.Double( -112, -144),
+    	new Point2D.Double( -114, -152),
+    	new Point2D.Double( -103, -146),
+    	new Point2D.Double( -57, -150),
+    	new Point2D.Double( 2, -153)
+  };
+
+   public Tree( double x, double y )
+   {
+      super( x, y );
+      makeIrregular( shape );
+   }
+
 }
 
 class House extends FlatlandObject

@@ -19,7 +19,10 @@ public class Flatland
       //origin.setLabel( "Origin" );
       Figure aSquare = flatland.addFigure( 0, 0, 4 );
       flatland.setControl( aSquare );
-      flatland.addHouse( 40, 0 );
+      flatland.addHouse( 0, 0 );
+      flatland.addTree( -500, 100 );
+      flatland.addTree( -800, 200 );
+      flatland.addTree( -400, -400 );
       flatland.addFigure( -168, 25, 5 );
       flatland.addFigure( -135, 70, 5 );
       flatland.addFigure( -90, 110, 5 );

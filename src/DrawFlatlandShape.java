@@ -155,7 +155,7 @@ class DrawCanvas extends Canvas
       while( pointList.hasNext() )
       {
          point = pointList.getNext();
-         retString += "\t{" + point.x + ", " + point.y + "},\n";
+         retString += "\tnew Point2D.Double( " + point.x + ", " + point.y + "),\n";
       }
       retString += "}\n";
       
