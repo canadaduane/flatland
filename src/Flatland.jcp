@@ -1,0 +1,28 @@
+! ** JCreator Project File (C)2000
+! ********** DO NOT EDIT *********
+
+VERSION := "1.10"
+LABEL := "Flatland"
+JDKPROFILE := ""
+ACTIVE := "1"
+OUTPUTPATH := "..\\\\Flatland"
+COMPILER := ""
+
+! Start RunTime Configuration Structure
+#[BeginRunTime]LABEL := "<Default>" RUNAPPLIC := "" RUNAPPLET := "" PARAM := "" RUN := "Flatland" CHECK := "10" #[EndRunTime]
+! Start Required Libraries Structure
+
+! Start Project Folder Structure
+#[BeginFolder]
+LABEL := "Root"
+FILTER := ""
+
+#[BeginFile]SOURCE := "\\FlatlandVisor.java" #[EndFile]
+#[BeginFile]SOURCE := "\\FlatlandShape.java" #[EndFile]
+#[BeginFile]SOURCE := "\\FlatlandPoint.java" #[EndFile]
+#[BeginFile]SOURCE := "\\FlatlandPanel.java" #[EndFile]
+#[BeginFile]SOURCE := "\\FlatlandObject.java" #[EndFile]
+#[BeginFile]SOURCE := "\\FlatlandCanvas.java" #[EndFile]
+#[BeginFile]SOURCE := "\\FlatlandApplet.java" #[EndFile]
+#[BeginFile]SOURCE := "\\Flatland.java" #[EndFile]
+#[EndFolder]

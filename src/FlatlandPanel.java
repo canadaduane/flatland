@@ -50,7 +50,7 @@ class FlatlandPanel extends JPanel
       
       // World Control panel
       JPanel worldPanel = new JPanel();
-      worldPanel.setBorder( BorderFactory.createTitledBorder( BorderFactory.createLineBorder( Color.BLACK ), "A. Square" ) );
+      worldPanel.setBorder( BorderFactory.createTitledBorder( BorderFactory.createLineBorder( Color.BLACK ), "World" ) );
       worldPanel.setLayout( new BoxLayout( worldPanel, BoxLayout.Y_AXIS ) );
       JCheckBox chkFog = new JCheckBox( "Fog on/off", true );
       chkFog.addActionListener( new ActionListener() {
@@ -68,10 +68,63 @@ class FlatlandPanel extends JPanel
          }
       } );
       worldPanel.add( chkFog );
+
       JCheckBox chkColor = new JCheckBox( "Color on/off", false );
+      chkColor.addActionListener( new ActionListener() {
+         public void actionPerformed( ActionEvent e ) {
+            JCheckBox checkBox = (JCheckBox)e.getSource();
+            if( checkBox.isSelected() )
+            {
+               getCanvas().useColor = true ;
+            }
+            else
+            {
+               getCanvas().useColor = false;
+            }
+            getCanvas().requestFocus();
+         }
+      } );
       worldPanel.add( chkColor );
-      JCheckBox chkInfo = new JCheckBox( "Information on/off", false );
-      worldPanel.add( chkInfo );
+
+      JCheckBox chkLorentz = new JCheckBox( "Lorentz Contraction on/off", true );
+      chkLorentz.addActionListener( new ActionListener() {
+         public void actionPerformed( ActionEvent e ) {
+            JCheckBox checkBox = (JCheckBox)e.getSource();
+            if( checkBox.isSelected() )
+            {
+               getCanvas().LIGHT_SPEED = 15;
+            }
+            else
+            {
+               getCanvas().LIGHT_SPEED = 0;
+            }
+            getCanvas().requestFocus();
+         }
+      } );
+      worldPanel.add( chkLorentz );
+
+      JCheckBox chkGravity = new JCheckBox( "Gravity on/off", false );
+      chkGravity.addActionListener( new ActionListener() {
+         public void actionPerformed( ActionEvent e ) {
+            JCheckBox checkBox = (JCheckBox)e.getSource();
+            if( checkBox.isSelected() )
+            {
+               getCanvas().gravity = true;
+            }
+            else
+            {
+               getCanvas().gravity = false;
+            }
+            getCanvas().requestFocus();
+         }
+      } );
+      worldPanel.add( chkGravity );
+
       add( worldPanel );
+
+			add( Box.createRigidArea( new Dimension( 1, 45 ) ) );
+			
+			add( new JLabel( "  Mouse clicks change ", SwingConstants.CENTER ) );
+			add( new JLabel( "    reference frame", SwingConstants.CENTER ) );
    }
 }

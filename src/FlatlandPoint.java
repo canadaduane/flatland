@@ -1,31 +1,63 @@
+import java.awt.Color;
 import java.awt.geom.Point2D;
 import java.lang.Math;
 import java.util.Vector;
 import java.util.Enumeration;
+import java.util.Random;
 
 class FlatlandPoint extends Point2D.Double
 {
    // *** Generic Canvas Access Methods ***
    static FlatlandCanvas defaultCanvas = null;
+   static Random rnd = new Random();
    FlatlandCanvas canvas = null;
+   Color lineColor = Color.BLACK;
 
    public static void setDefaultCanvas( FlatlandCanvas fc ) { defaultCanvas = fc; }
    public void setCanvas( FlatlandCanvas fc ) { canvas = fc; }
    public FlatlandCanvas getCanvas() { return ( canvas == null ? defaultCanvas : canvas ); }
    //  ***
 
-   double angle = 0, distance = 0;
+   double angle = 0, distance = 0, velocityX = 0, velocityY = 0;
    Vector children = new Vector();
    
    public FlatlandPoint()
    {
       super();
+      setColor();
    }
    
    public FlatlandPoint( double theX, double theY )
    {
       super( theX, theY );
+      setColor();
       //computeRadial();
+   }
+   
+   public void setColor()
+   {
+      int red = rnd.nextInt( 2 ) * 127;
+      int green = rnd.nextInt( 2 ) * 127;
+      int blue = rnd.nextInt( 3 ) * 127;
+      
+      if( red == 254 && green == 254 && blue == 254 )
+      {
+         red = 0;
+         green = 0;
+         blue = 0;
+      }
+      
+      lineColor = new Color( red, green, blue );
+   }
+   
+   public void setColor( int red, int green, int blue )
+   {
+      lineColor = new Color( red, green, blue );
+   }
+   
+   public void setColor( Color c )
+   {
+      lineColor = c;
    }
    
    public void computeRadial( FlatlandPoint fp )
@@ -57,18 +89,61 @@ class FlatlandPoint extends Point2D.Double
    
    public double xFromOrigin()
    {
-      double tempX = x - getCanvas().origin.x;
-      double tempY = y - getCanvas().origin.y;
-      double tempAngle = getCanvas().control.direction;
-      return tempX * Math.cos( tempAngle ) + tempY * Math.sin( tempAngle );
+      FlatlandCanvas fc = getCanvas();
+      
+      double light = fc.LIGHT_SPEED;
+      double tempX = x - fc.origin.x;
+      double tempY = y - fc.origin.y;
+      double tempAngle = fc.origin.angle;
+		if( light != 0.0 )
+		{
+			double originVelocity = Math.abs(fc.control.velocity);
+			double velocityDiff = Math.pow( originVelocity * Math.sin( tempAngle ) - velocityY, 2 ) + Math.pow( originVelocity * Math.cos( tempAngle ) - velocityX, 2 );
+			double gamma = (Math.sqrt( 1.0 - ( (velocityDiff) / (light * light) ) ) );
+			double a = tempX * Math.cos( tempAngle ) + tempY * Math.sin( tempAngle );
+			double b = tempX * Math.sin( tempAngle ) - tempY * Math.cos( tempAngle );
+      
+      		tempX = ( tempX * ( a * a * gamma + b * b ) + tempY * b * a * ( 1 - gamma ) ) / (a*a + b*b);
+      		// Wacky Warp World
+      		//double r = Math.sqrt( tempX * tempX + tempY * tempY );
+      		//gamma = 60;
+      		//tempX = tempX - ( (gamma * Math.cos( tempAngle ) - tempY * gamma * Math.sin( tempAngle ) ) / r );
+			return tempX;
+      	}
+      	else
+      	{
+      		return tempX * Math.cos( tempAngle ) + tempY * Math.sin( tempAngle );
+      	}
    }
 
    public double yFromOrigin()
    {
-      double tempX = x - getCanvas().origin.x;
-      double tempY = y - getCanvas().origin.y;
-      double tempAngle = getCanvas().control.direction;
-      return -tempX * Math.sin( tempAngle ) + tempY * Math.cos( tempAngle );
+      FlatlandCanvas fc = getCanvas();
+      
+      double light = fc.LIGHT_SPEED;
+      double tempX = x - fc.origin.x;
+      double tempY = y - fc.origin.y;
+      double tempAngle = fc.origin.angle;
+		if( light != 0.0 )
+		{
+			double originVelocity = Math.abs(fc.control.velocity);
+			double velocityDiff = Math.pow( originVelocity * Math.sin( tempAngle ) - velocityY, 2 ) + Math.pow( originVelocity * Math.cos( tempAngle ) - velocityX, 2 );
+			double gamma = (Math.sqrt( 1.0 - ( (velocityDiff) / (light * light) ) ) );
+			double a = tempX * Math.cos( tempAngle ) + tempY * Math.sin( tempAngle );
+			double b = tempX * Math.sin( tempAngle ) - tempY * Math.cos( tempAngle );
+      
+			tempY = ( tempY * ( a * a * gamma + b * b ) - tempX * b * a * ( 1 - gamma ) ) / (a*a + b*b);
+	      	// Wacky Warp World
+    	  	//double r = Math.sqrt( tempX * tempX + tempY * tempY );
+      		//gamma = 60;
+      		//tempY = tempY - ( (gamma * Math.cos( tempAngle ) + tempX * gamma * Math.sin( tempAngle ) ) / r );
+
+			return tempY;
+      	}
+      	else
+      	{
+      		return -tempX * Math.sin( tempAngle ) + tempY * Math.cos( tempAngle );
+      	}
    }
    
    

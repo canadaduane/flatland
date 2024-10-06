@@ -20,6 +20,7 @@ class FlatlandObject
    double velocity = 0, direction = 0, angularMomentum = 0;
    String label;
    boolean showInformation = false;
+   boolean fixedPosition = true;
   
    public FlatlandObject() {
       shape = new FlatlandShape();
@@ -86,7 +87,17 @@ class FlatlandObject
             y1 = -(int)shape.point[ i ].yFromOrigin();
             x2 = (int)shape.point[ j ].xFromOrigin();
             y2 = -(int)shape.point[ j ].yFromOrigin();
-   
+            
+            // Use the appropriate color, either from the point,
+            // or else just black if we're in black and white mode
+            if( getCanvas().useColor )
+            {
+               g.setColor( shape.point[ i ].lineColor );
+            }
+            else
+            {
+               g.setColor( Color.BLACK );
+            }
             g.drawLine( x1, y1, x2, y2 );
             // g.drawLine( cx, cy, cx, cy );
             j++;
@@ -95,27 +106,27 @@ class FlatlandObject
       }   
    }
    
-   // Push the corner (point) towards a given angle in radians
-   // with a particular force
-   public void push( double force, double angle )
-   {
-      // Vector addition
-      // Cr^2 = Ar^2 + Br^2 + 2ArBr[cos(direction-angle)]
-      double Ar = velocity;
-      double Ax, Ay;
-      double Br = force;
-      double Bx, By;
-      velocity = Math.sqrt( Ar*Ar + Br*Br + 2*Ar*Br*Math.cos( direction - angle ) );
-      Ay = velocity * Math.sin( direction );
-      Ax = velocity * Math.cos( direction );
-      By = force * Math.sin( angle );
-      Bx = force * Math.cos( angle );
-
-      direction = Math.atan( (Ay + By) / (Ax + Bx) );
-      // Flip the XY axis if the angle should be in the negative quadrants
-      if( Ax + Bx < 0 ) direction += Math.PI;
-   }
-
+  // Push the center (point) towards a given angle in radians
+  // with a particular force
+	public void push( double force, double angle )
+	{
+		// Vector addition
+		// Cr^2 = Ar^2 + Br^2 + 2ArBr[cos(direction-angle)]
+		double Ar = velocity;
+		double Ax, Ay;
+		double Br = force;
+		double Bx, By;
+		velocity = Math.sqrt( Ar*Ar + Br*Br + 2*Ar*Br*Math.cos( direction - angle ) );
+		Ay = velocity * Math.sin( direction );
+		Ax = velocity * Math.cos( direction );
+		By = force * Math.sin( angle );
+		Bx = force * Math.cos( angle );
+		
+		direction = Math.atan( (Ay + By) / (Ax + Bx) );
+		// Flip the XY axis if the angle should be in the negative quadrants
+		if( Ax + Bx < 0 ) direction += Math.PI;
+	}
+	
    public void spin( double am )
    {
       angularMomentum += am;
@@ -133,6 +144,8 @@ class FlatlandObject
    
    public void move()
    {
+   	  //double oldVelocity = velocity;
+   	  
       velocity *= ( 1 - FRICTION_COEFFICIENT );
       angularMomentum *= ( 1 - FRICTION_COEFFICIENT );
       
@@ -143,7 +156,11 @@ class FlatlandObject
          direction -= Math.PI * 2;
       
       shape.setAngle( direction );
+      shape.setVelocity( velocity );
       shape.slide( velocity * Math.cos( direction ), velocity * Math.sin( direction ) );
+      
+      //Gravity
+      if( getCanvas().gravity && !fixedPosition ) push( 0.1, Math.PI * 3 / 2 );
    }
 }
 
@@ -157,6 +174,7 @@ class Figure extends FlatlandObject
       super( x, y );
       shape.makeRegular( sides, DEFAULT_RADIUS );
       eye = new Eye( this, shape.point[ 0 ] );
+      fixedPosition = false;
    }
    
    public void move()
@@ -232,7 +250,7 @@ class Eye extends FlatlandObject
    boolean active = false;
    boolean showRays = true;
    final double DEFAULT_RADIUS = 3;
-	final int RANGE = 300;
+	final int RANGE = 450;
 	FlatlandPoint pointOfAttachment;
    FlatlandObject objectOfAttachment;
    FlatlandVisor visor;
@@ -272,6 +290,7 @@ class Eye extends FlatlandObject
 
 					if( endPoint != null )
 					{
+                  endPoint.setColor( flObj.shape.point[ j ].lineColor );
                   endPoint.distance = endPoint.distance( shape.center );
 						if( shortestPoint == null ) {
 							shortestPoint = endPoint;
@@ -340,7 +359,17 @@ class Eye extends FlatlandObject
                //System.out.println( "intensity: " + intensity + " dist: " + point.distance );
                if( intensity > 255 ) intensity = 255;
                if( intensity < 0 ) intensity = 0;
-               visorGraphics.setColor( new Color( intensity, intensity, intensity ) );
+               if( getCanvas().useColor )
+               {
+                  int red = point.lineColor.getRed();
+                  int green2 = point.lineColor.getGreen();
+                  int blue = point.lineColor.getBlue();
+                  visorGraphics.setColor( new Color( intensity * red / 255, intensity * green2 / 255, intensity * blue / 255 ) );
+               }
+               else
+               {
+                  visorGraphics.setColor( new Color( intensity, intensity, intensity ) );
+               }
                visorGraphics.fillRect( displayX, displayY, displayWidth, displayHeight );
             }
             else
@@ -479,4 +508,154 @@ class House extends FlatlandObject
       super( x, y );
       shape.loadData( houseShapeData );
    }
+}
+
+class Tree extends FlatlandObject
+{
+	double[][] deciduousShapeData =
+   {
+    	{ -5, -75},
+    	{ 41, -79},
+    	{ 58, -80},
+    	{ 47, -66},
+    	{ 24, -44},
+    	{ 20, -16},
+    	{ 21, 22},
+    	{ 30, 43},
+    	{ 47, 48},
+    	{ 61, 48},
+    	{ 63, 38},
+    	{ 65, 31},
+    	{ 70, 25},
+    	{ 77, 22},
+    	{ 86, 23},
+    	{ 97, 32},
+    	{ 97, 49},
+    	{ 92, 59},
+    	{ 84, 67},
+    	{ 72, 64},
+    	{ 64, 55},
+    	{ 44, 59},
+    	{ 22, 56},
+    	{ 24, 68},
+    	{ 31, 74},
+    	{ 39, 77},
+    	{ 50, 80},
+    	{ 59, 88},
+    	{ 64, 96},
+    	{ 75, 87},
+    	{ 85, 90},
+    	{ 91, 97},
+    	{ 93, 107},
+    	{ 85, 121},
+    	{ 71, 125},
+    	{ 64, 121},
+    	{ 62, 115},
+    	{ 62, 108},
+    	{ 60, 102},
+    	{ 50, 90},
+    	{ 29, 84},
+    	{ 11, 70},
+    	{ 3, 119},
+    	{ 13, 127},
+    	{ 17, 133},
+    	{ 16, 145},
+    	{ 5, 150},
+    	{ -7, 150},
+    	{ -25, 141},
+    	{ -31, 131},
+    	{ -24, 116},
+    	{ -4, 111},
+    	{ 1, 85},
+    	{ -4, 66},
+    	{ -17, 64},
+    	{ -36, 76},
+    	{ -49, 87},
+    	{ -44, 103},
+    	{ -44, 115},
+    	{ -52, 122},
+    	{ -66, 123},
+    	{ -74, 114},
+    	{ -84, 97},
+    	{ -84, 87},
+    	{ -76, 74},
+    	{ -65, 71},
+    	{ -53, 75},
+    	{ -44, 70},
+    	{ -32, 62},
+    	{ -18, 53},
+    	{ -18, 41},
+    	{ -30, 36},
+    	{ -40, 39},
+    	{ -49, 43},
+    	{ -50, 52},
+    	{ -58, 59},
+    	{ -70, 57},
+    	{ -76, 47},
+    	{ -71, 33},
+    	{ -60, 29},
+    	{ -50, 34},
+    	{ -34, 28},
+    	{ -16, 14},
+    	{ -18, -11},
+    	{ -20, -34},
+    	{ -33, -50},
+    	{ -43, -56},
+    	{ -52, -69},
+    	{ -57, -78},
+    	{ -5, -75 },
+   };
+
+   public Tree( double x, double y )
+   {
+      super( x, y );
+      shape.loadData( deciduousShapeData );
+   }
+
+}
+
+class Mountain extends FlatlandObject
+{
+	double[][] mountain = {
+        { -93, 49},
+        { -159, -39},
+        { -31, -43},
+        { 86, -36},
+        { 124, -44},
+        { 79, 84},
+        { 64, 79},
+        { 45, 47},
+        { 54, 61},
+        { 65, 52},
+        { 77, 55},
+        { 83, 51},
+        { 89, 55},
+        { 78, 84},
+        { 64, 79},
+        { 57, 67},
+        { 2, 136},
+        { -31, 103},
+        { -17, 89},
+        { -5, 94},
+        { 10, 90},
+        { 27, 104},
+        { 10, 90},
+        { -5, 94},
+        { -17, 89},
+        { -31, 102},
+        { -65, 41},
+        { -76, 37},
+        { -87, 27},
+        { -92, 31},
+        { -100, 27},
+        { -104, 34},
+        { -93, 50},
+        { -76, 37}
+    };
+
+	public Mountain( double x, double y )
+	{
+		super( x, y );
+		shape.loadData( mountain );
+	}
 }

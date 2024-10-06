@@ -1,5 +1,8 @@
 import java.io.*;
 import java.util.StringTokenizer;
+import java.awt.geom.Rectangle2D;
+import java.util.Vector;
+import java.util.Enumeration;
 
 class FlatlandShape
 {
@@ -164,18 +167,57 @@ class FlatlandShape
       if( angle - a != 0 )
       {
          angle = a;
+         center.angle = a;
 
          double tempAngle;
          for( int i = 0; i < tail; i++ )
          {
-            //point[ i ].computeRadial( center );
-            //center.computeRadial( point[ i ] );
             tempAngle = point[ i ].angle + a;
-            //tempAngle = getCanvas().control.direction;
             point[ i ].move(
                center.x + point[ i ].distance * Math.cos( tempAngle ),
                center.y + point[ i ].distance * Math.sin( tempAngle ) );
          }
       }
+   }
+   
+   public void setVelocity( double v )
+   {
+      double vx = Math.cos( angle ) * v;
+      double vy = Math.sin( angle ) * v;
+      
+      center.velocityX = vx;
+      center.velocityY = vy;
+      for( int i = 0; i < tail; i++ )
+      {
+         point[ i ].velocityX = vx;
+         point[ i ].velocityY = vy;
+         
+         Enumeration enum = point[i].children.elements();
+         while( enum.hasMoreElements() )
+         {
+        	 FlatlandPoint fp = (FlatlandPoint)enum.nextElement();
+             fp.velocityX = vx;
+             fp.velocityY = vy;
+         }
+      }
+   }
+
+   public Rectangle2D.Double getBoundingBox()
+   {
+      double left = point[ 0 ].x, right = point[ 0 ].x, top = point[ 0 ].y, bottom = point[ 0 ].y;
+      
+      for( int i = 1; i < tail; i++ )
+      {
+         if( point[ i ].x < left )
+            left = point[ i ].x;
+         if( point[ i ].x > right )
+            right = point[ i ].x;
+         if( point[ i ].y < top )
+            top = point[ i ].y;
+         if( point[ i ].y > bottom )
+            bottom = point[ i ].y;
+      }
+      
+      return new Rectangle2D.Double( left, top, right-left, bottom-top );
    }
 }

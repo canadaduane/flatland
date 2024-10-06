@@ -1,6 +1,7 @@
 import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.lang.Math;
 
@@ -8,8 +9,11 @@ class FlatlandCanvas extends JPanel
 {
    static final int WIDTH = 640;
    static final int HEIGHT = 480;
+   float LIGHT_SPEED = 15;
    boolean[] keys = new boolean[ 4 ];
    boolean fog = true;
+   boolean useColor = false;
+   boolean gravity = false;
    FlatlandObject control;
    FlatlandVisor visor;
    FlatlandPoint origin;
@@ -65,6 +69,7 @@ class FlatlandCanvas extends JPanel
                   keys[ 2 ] = true;
                   break;
                case KeyEvent.VK_DOWN:
+				         //control.direction += Math.PI;
                   keys[ 3 ] = true;
                   break;
                default:
@@ -85,6 +90,7 @@ class FlatlandCanvas extends JPanel
                   keys[ 2 ] = false;
                   break;
                case KeyEvent.VK_DOWN:
+				         //control.direction -= Math.PI;
                   keys[ 3 ] = false;
                   break;
                default:
@@ -93,6 +99,29 @@ class FlatlandCanvas extends JPanel
          }
          public void keyTyped( KeyEvent e )
          {
+         }
+      } );
+      
+      //final FlatlandCanvas thisCanvas = this;
+      addMouseListener( new MouseAdapter() {
+         public void mouseClicked( MouseEvent e )
+         {
+            int x = e.getX() - WIDTH/2;
+            int y = e.getY() - HEIGHT/2;
+            double rotatedX, rotatedY;
+            double angle = origin.angle;
+            // "Unrotate" the mouse click so that it's in a useful coordinate
+            // reference frame
+            rotatedX = x * Math.cos( angle ) + y * Math.sin( angle );
+            rotatedY = y * Math.cos( angle ) - x * Math.sin( angle );
+
+			// Select the smallest object that the user is clicking on,
+			// and make its center the point of origin
+			FlatlandObject select = selectSmallestObject( origin.x + rotatedX, origin.y - rotatedY );
+            if( select != null )
+			{
+				origin = select.shape.center;
+			}
          }
       } );
    }
@@ -122,28 +151,21 @@ class FlatlandCanvas extends JPanel
    public void moveAllObjects()
    {
       // Keys control one particular Figure in Flatland
-      /*
-      if( keys[ 0 ] ) control.push( 2, Math.PI / 2 );
-      if( keys[ 1 ] ) control.push( 2, Math.PI );
-      if( keys[ 2 ] ) control.push( 2, 0 );
-      if( keys[ 3 ] ) control.push( 2, Math.PI * 3 / 2 );
-      */
-      if( keys[ 0 ] ) control.push( 2, control.direction );
-      if( keys[ 1 ] ) control.spin( Math.PI/150 );
-      if( keys[ 2 ] ) control.spin( -Math.PI/150 );
+      if( keys[ 0 ] ) control.push( 1.5 );
+      if( keys[ 1 ] ) control.spin( Math.PI/100 );
+      if( keys[ 2 ] ) control.spin( -Math.PI/100 );
       if( keys[ 3 ] ) control.brake( 2 );
-      /*
-      if( keys[ 3 ] ) {
-         double newDir = control.direction + Math.PI;
-         if( newDir >= Math.PI * 2 ) newDir -= Math.PI * 2;
-         if( newDir < 0 ) newDir += Math.PI * 2;
-         control.push( 1, newDir );
-      }
-      */
+      
+      //if( keys[ 3 ] ) {
+         //if( newDir >= Math.PI * 2 ) newDir -= Math.PI * 2;
+         //if( newDir < 0 ) newDir += Math.PI * 2;
+         //control.push( 1, control.direction );
+      //}
+      
       
       Object[] listOfObjects = (Object[])objects.toArray();
       FlatlandObject object;
-      for( int i = 0; i < objects.size(); i++ )
+      for( int i = 0; i < listOfObjects.length; i++ )
       {
          object = (FlatlandObject)(listOfObjects[ i ]);
          object.move();
@@ -172,4 +194,26 @@ class FlatlandCanvas extends JPanel
       objects.add( object );
       return object;
    }
+		
+	public FlatlandObject selectSmallestObject( double x, double y )
+	{
+		Object[] listOfObjects = (Object[])objects.toArray();
+		FlatlandObject object;
+		FlatlandObject smallestObject = null;
+		double smallestSize = Math.sqrt( WIDTH*WIDTH + HEIGHT*HEIGHT );
+		
+		for( int i = 0; i < objects.size(); i++ )
+		{
+			object = (FlatlandObject)(listOfObjects[ i ]);
+			Rectangle2D.Double rect = object.shape.getBoundingBox();
+			double squareRoot = Math.sqrt( rect.getWidth() * rect.getWidth() + rect.getHeight() * rect.getHeight() );
+			if( rect.contains( x, y ) && squareRoot < smallestSize )
+			{
+				smallestSize = squareRoot;
+				smallestObject = object;
+			}
+		}
+		
+		return smallestObject;
+	}
 }
