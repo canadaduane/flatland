@@ -162,9 +162,62 @@ class Figure extends FlatlandObject
    public void move()
    {
       super.move();
+      detectCollision();
       eye.direction = direction;
    }
    
+   public void detectCollision()
+   {
+		Object[] listOfObjects = (Object[])getCanvas().objects.toArray();
+		FlatlandObject flObj;
+      FlatlandPoint collisionPoint;
+      FlatlandPoint p1, p2, p3, p4;
+      
+		for( int i = 0; i < listOfObjects.length; i++ )
+		{
+			flObj = (FlatlandObject)(listOfObjects[ i ]);
+			if( flObj != this )
+			{
+				// Go through each line segment in each FlatlandObject
+				// and determine if our line intersects
+				int k = 1;
+				for( int j = 0; j < flObj.shape.tail; j++ )
+				{
+               p1 = flObj.shape.point[ j ];
+               p2 = flObj.shape.point[ k ];
+               
+               int l = 1;
+               for( int m = 0; m < shape.tail; m++ )
+               {
+                  p3 = shape.point[ l ];
+                  p4 = shape.point[ m ];
+                  
+                  collisionPoint = p1.intersect( p2, p3, p4 );
+                  if( collisionPoint != null )
+                  {
+                     velocity = -velocity;
+                     angularMomentum = -angularMomentum;
+                     direction += angularMomentum;
+                     if( direction < 0 )
+                        direction += Math.PI * 2;
+                     if( direction >= Math.PI * 2 )
+                        direction -= Math.PI * 2;
+                     
+                     shape.setAngle( direction );
+                     shape.slide( velocity * Math.cos( direction ), velocity * Math.sin( direction ) );
+                     return;
+                  }
+                  
+                  l++;
+                  if( l >= shape.tail ) l = 0;
+               }
+               k++;
+               if( k >= flObj.shape.tail ) k = 0;
+            }
+         }
+      }
+   }
+     
    public void paint( Graphics g )
    {
       super.paint( g );
@@ -175,12 +228,14 @@ class Figure extends FlatlandObject
 
 class Eye extends FlatlandObject
 {
-   final int TRACE_LINES = 32;
+   final int TRACE_LINES = 128;
    boolean active = false;
+   boolean showRays = true;
    final double DEFAULT_RADIUS = 3;
 	final int RANGE = 300;
 	FlatlandPoint pointOfAttachment;
    FlatlandObject objectOfAttachment;
+   FlatlandVisor visor;
 	
    public Eye( FlatlandObject fo, FlatlandPoint fp )
    {
@@ -239,36 +294,61 @@ class Eye extends FlatlandObject
 	{
       super.paint( g );
       
-      int displayX = -getCanvas().getWidth() / 2 + 20 + ( TRACE_LINES * 5 );
-      int displayY = -getCanvas().getHeight() / 2 + 20;
-      int green = 255 - 32 * 5;
+      
       if( active )
       {
+         Graphics visorGraphics = g;
+         if( visor != null )
+         {
+            visorGraphics = visor.getGraphics();
+         }
+
+         //int displayX = -visor.getWidth() / 2 + 20 + ( TRACE_LINES * 5 );
+         //int displayY = -visor.getHeight() / 2 + 20;
+         int displayX = visor.getWidth();
+         int displayY = 0;
+         int displayWidth = visor.getWidth() / TRACE_LINES;
+         int displayHeight = visor.getHeight();
+         int green = 255;
+         int greenIncrement = 0;
+         int intensity = 255;
+         
          for( double d = -Math.PI/4; d <= Math.PI/4; d += Math.PI / 2 / TRACE_LINES )
          {
             FlatlandPoint point = firstVisible( direction + d );
             if( point != null )
             {
-            	g.setColor( new Color( 0, green, 30 ) );
-               g.fillRect( displayX, displayY + 10, 5, 5 );
-               green += 5;
-            	g.drawLine( (int)shape.center.xFromOrigin(), -(int)shape.center.yFromOrigin(), (int)point.xFromOrigin(), -(int)point.yFromOrigin() );
-            	g.setColor( Color.RED );
-            	g.fillOval( (int)point.xFromOrigin()-2, -(int)point.yFromOrigin()-2, 5, 5 );
+               // Draw the green lines and red contact points
+               if( showRays )
+               {
+                  g.setColor( new Color( 0, green, 30 ) );
+            	   g.drawLine( (int)shape.center.xFromOrigin(), -(int)shape.center.yFromOrigin(), (int)point.xFromOrigin(), -(int)point.yFromOrigin() );
+            	   g.setColor( Color.RED );
+               	g.fillOval( (int)point.xFromOrigin()-2, -(int)point.yFromOrigin()-2, 5, 5 );
                
+                  green += greenIncrement;
+               }
                
-               int intensity = 255 - (int)( point.distance / RANGE * 255 );
+               if( getCanvas().fog )
+               {
+                  intensity = 255 - (int)( point.distance / RANGE * 255 );
+               }
+               else
+               {
+                  intensity = 255;
+               }
                //System.out.println( "intensity: " + intensity + " dist: " + point.distance );
                if( intensity > 255 ) intensity = 255;
-               g.setColor( new Color( intensity, intensity, intensity ) );
-               g.fillRect( displayX, displayY, 5, 10 );
+               if( intensity < 0 ) intensity = 0;
+               visorGraphics.setColor( new Color( intensity, intensity, intensity ) );
+               visorGraphics.fillRect( displayX, displayY, displayWidth, displayHeight );
             }
             else
             {
-               g.setColor( Color.black );
-               g.fillRect( displayX, displayY, 5, 10 );
+               visorGraphics.setColor( Color.black );
+               visorGraphics.fillRect( displayX, displayY, displayWidth, displayHeight );
             }
-            displayX -= 5;
+            displayX -= displayWidth;
          }
    		g.setColor( Color.BLACK );
       }

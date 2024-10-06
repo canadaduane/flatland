@@ -110,6 +110,25 @@ class FlatlandPoint extends Point2D.Double
          retX = ( Qy1 - Pb ) / Pm;
          retY = Qy1;
       }
+      else if( Prun == 0 )
+      {
+         Qm = Qrise / Qrun;      // slope of segment Q
+         
+         Qb = Qy1 - Qm * Qx1;    // y-intercept of segment Q
+         // If we have an infinite slope, deal with it separately
+
+         retX = Px1;
+         retY = Qm * Px1 + Qb;
+      }
+      else if( Prise == 0 )
+      {
+         Qm = Qrise / Qrun;      // slope of segment Q
+         
+         Qb = Qy1 - Qm * Qx1;    // y-intercept of segment Q
+         
+         retX = ( Py1 - Qb ) / Qm;
+         retY = Py1;
+      }
       else
       {
          Qm = Qrise / Qrun;      // slope of segment Q
