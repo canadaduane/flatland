@@ -9,7 +9,8 @@ class FlatlandCanvas extends Canvas
    static final int WIDTH = 640;
    static final int HEIGHT = 480;
    boolean[] keys = new boolean[ 4 ];
-   static FlatlandObject control;
+   FlatlandObject control;
+   FlatlandPoint origin;
    ArrayList objects;
    Timer timer = new Timer( 50, null );
    
@@ -19,6 +20,10 @@ class FlatlandCanvas extends Canvas
       setBackground( Color.WHITE );
       setSize( WIDTH, HEIGHT );
       objects = new ArrayList();
+
+      FlatlandObject.setDefaultCanvas( this );
+      FlatlandShape.setDefaultCanvas( this );
+      FlatlandPoint.setDefaultCanvas( this );
       
       // Initialize the timer that will automagically update each
       // object and repaint the canvas
@@ -86,75 +91,52 @@ class FlatlandCanvas extends Canvas
       } );
    }
    
-   public static void setControl( FlatlandObject flObj )
+   public void setControl( FlatlandObject object )
    {
-      control = flObj;
+      control = object;
+      Figure figure = (Figure)object;
+      figure.eye.active = true;
    }
    
    public void moveAllObjects()
    {
       // Keys control one particular Figure in Flatland
+      /*
       if( keys[ 0 ] ) control.push( 2, Math.PI / 2 );
       if( keys[ 1 ] ) control.push( 2, Math.PI );
       if( keys[ 2 ] ) control.push( 2, 0 );
       if( keys[ 3 ] ) control.push( 2, Math.PI * 3 / 2 );
+      */
+      if( keys[ 0 ] ) control.push( 2, control.direction );
+      if( keys[ 1 ] ) control.spin( Math.PI/50 );
+      if( keys[ 2 ] ) control.spin( -Math.PI/50 );
+      if( keys[ 3 ] ) control.brake( 2 );
    
       Object[] listOfObjects = (Object[])objects.toArray();
-      FlatlandObject flObj;
+      FlatlandObject object;
       for( int i = 0; i < objects.size(); i++ )
       {
-         flObj = (FlatlandObject)(listOfObjects[ i ]);
-         flObj.move();
-      }
-   }
-   
-   public void paintAllObjects( Graphics g )
-   {
-      Object[] listOfObjects = (Object[])objects.toArray();
-      FlatlandObject flObj;
-      for( int i = 0; i < objects.size(); i++ )
-      {
-         flObj = (FlatlandObject)(listOfObjects[ i ]);
-         flObj.paint( g );
+         object = (FlatlandObject)(listOfObjects[ i ]);
+         object.move();
       }
    }
    
    public void paint( Graphics g )
    {
       g.translate( WIDTH / 2, HEIGHT / 2 );      
-      //System.out.println( "" + objects.size() + " objects to draw." );
-      paintAllObjects( g );      
+
+      Object[] listOfObjects = (Object[])objects.toArray();
+      FlatlandObject object;
+      for( int i = 0; i < objects.size(); i++ )
+      {
+         object = (FlatlandObject)(listOfObjects[ i ]);
+         object.paint( g );
+      }
    }
    
-   public FlatlandObject addObject( double x, double y )
+   public FlatlandObject add( FlatlandObject object )
    {
-      FlatlandObject obj = new FlatlandObject( x, y );
-      objects.add( obj );
-      
-      return obj;
-   }
-
-   public Figure addFigure( double x, double y, int sides )
-   {
-      Figure fig = new Figure( x, y, sides );
-      objects.add( fig );
-      
-      return fig;
-   }
-
-   public Tree addTree( double x, double y )
-   {
-      Tree tree = new Tree( x, y );
-      objects.add( tree );
-      
-      return tree;
-   }
-
-   public House addHouse( double x, double y )
-   {
-      House house = new House( x, y );
-      objects.add( house );
-      
-      return house;
+      objects.add( object );
+      return object;
    }
 }

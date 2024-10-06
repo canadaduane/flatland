@@ -5,8 +5,6 @@ import java.util.ArrayList;
 
 public class Flatland
 {
-   //FlatlandObject myObject;
-   Figure myFigure;
    public JFrame flatlandFrame;
    FlatlandCanvas flatland;
    
@@ -15,22 +13,25 @@ public class Flatland
    public Flatland()
    {
       flatland = new FlatlandCanvas();
+      //flatland.setDefaultCanvas();
+      
+      Figure aSquare = new Figure( 0, 0, 4 );
+      flatland.origin = aSquare.shape.center;
+      flatland.setControl( aSquare );
       //FlatlandObject origin = flatland.addObject( 0, 0 );
       //origin.setLabel( "Origin" );
-      Figure aSquare = flatland.addFigure( 0, 0, 4 );
-      flatland.setControl( aSquare );
-      flatland.addHouse( 0, 0 );
-      flatland.addTree( -500, 100 );
-      flatland.addTree( -800, 200 );
-      flatland.addTree( -400, -400 );
-      flatland.addFigure( -168, 25, 5 );
-      flatland.addFigure( -135, 70, 5 );
-      flatland.addFigure( -90, 110, 5 );
-      flatland.addFigure( -30, 150, 5 );
-      flatland.addFigure( -30, -140, 6 );
-      flatland.addFigure( -100, -140, 6 );
-      flatland.addFigure( 300, -20, 2 );
-//      flatland.addFigure( 170, 20, 18 );
+      flatland.add( aSquare );
+      flatland.add( new House( 0, 0 ) );
+      //flatland.add( new Tree( -500, 100 ) );
+      //flatland.add( new Tree( -800, 200 ) );
+      //flatland.add( new Tree( -400, -400 ) );
+      flatland.add( new Figure( -168, 25, 5 ) );
+      flatland.add( new Figure( -135, 70, 5 ) );
+      flatland.add( new Figure( -90, 110, 5 ) );
+      flatland.add( new Figure( -30, 150, 5 ) );
+      flatland.add( new Figure( -30, -140, 6 ) );
+      flatland.add( new Figure( -100, -140, 6 ) );
+      flatland.add( new Figure( 300, -20, 2 ) );
       
       //flatland.requestFocus();
       
