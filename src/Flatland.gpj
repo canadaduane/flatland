@@ -1,0 +1,16 @@
+!188;s
+A
+SAU0
+SCU0
+S+U0
+SJU0CLASSPATH+=.%PATH_SEP\012CLASSPATH=+%PATH_SEP%EXTENSION_PATH%SEPclasses%SEPuser%PATH_SEP%EXTENSION_PATH%SEPclasses%SEPsystem\012PATH=+%PATH_SEP%JAVA_BIN_DIR
+SOU0
+SPU0
+!149;f
+%	DrawFlatlandShape.java
+%	Flatland.java
+%	FlatlandApplet.java
+%	FlatlandCanvas.java
+%	FlatlandObject.java
+%	FlatlandPoint.java
+%	FlatlandShape.java

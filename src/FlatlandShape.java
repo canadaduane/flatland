@@ -71,6 +71,16 @@ class FlatlandShape
          System.out.println( e );
       }
    }
+		
+		public void loadData( double[][] data )
+		{
+			double[] pair;
+			for( int i = 0; i < data.length; i++ )
+			{
+				pair = data[ i ];
+				add( new FlatlandPoint( center.x + pair[ 0 ], center.y + pair[ 1 ] ) );
+			}
+		}
    
    public void add( FlatlandPoint p )
    {
@@ -150,28 +160,22 @@ class FlatlandShape
    public void setAngle( double a )
    {
       double distanceToCenter;
-      double angleDiff = angle - a;
-      
-      //if( this == getCanvas().control.shape )
-      //   System.out.println( "angle: " + angle + " a: " + a + " angleDiff: " + angleDiff );
          
-      if( angleDiff != 0 )
+      if( angle - a != 0 )
       {
          angle = a;
-            
-         //System.out.println( a );
+
+         double tempAngle;
          for( int i = 0; i < tail; i++ )
          {
-            center.computeRadial( point[ i ] );
+            //point[ i ].computeRadial( center );
+            //center.computeRadial( point[ i ] );
+            tempAngle = point[ i ].angle + a;
+            //tempAngle = getCanvas().control.direction;
             point[ i ].move(
-               center.x + point[ i ].distance * Math.cos( point[ i ].angle + a ),
-               center.y + point[ i ].distance * Math.sin( point[ i ].angle + a ) );
-            
-            //point[ i ].y = center.y + point[ i ].distance * Math.sin( point[ i ].angle + a );
-            //point[ i ].x = center.x + point[ i ].distance * Math.cos( point[ i ].angle + a );
+               center.x + point[ i ].distance * Math.cos( tempAngle ),
+               center.y + point[ i ].distance * Math.sin( tempAngle ) );
          }
-         
-
       }
    }
 }

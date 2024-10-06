@@ -1,19 +1,24 @@
 import java.applet.*;
 import java.awt.*;
 import java.awt.event.*;
+import javax.swing.*;
 
-public class FlatlandApplet extends Applet
+public class FlatlandApplet extends JApplet
 { 
    public void init()
    {
-      this.setBackground( Color.WHITE );
-      Button openFrame = new Button( "Begin" );
-      openFrame.addActionListener( new ActionListener() {
-         public void actionPerformed( ActionEvent e ) {
-            Flatland f = new Flatland();
-            f.flatlandFrame.setVisible( true );
-         }
-      } );
-      add( openFrame );
-   } 
+			
+			Flatland flatland = new Flatland();
+			
+			getContentPane().add( flatland.flatlandCanvas );
+			setSize( flatland.flatlandCanvas.getWidth(), flatland.flatlandCanvas.getHeight() );
+			requestFocusInWindow();
+			flatland.flatlandCanvas.requestFocus();
+			
+   }
+
+	public void paint( Graphics g )
+	{
+		g.drawString( "Applet? Where are you?", 20, 50 );
+	}
 }

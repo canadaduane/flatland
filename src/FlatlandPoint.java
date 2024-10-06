@@ -57,12 +57,18 @@ class FlatlandPoint extends Point2D.Double
    
    public double xFromOrigin()
    {
-      return x - getCanvas().origin.x;
+      double tempX = x - getCanvas().origin.x;
+      double tempY = y - getCanvas().origin.y;
+      double tempAngle = getCanvas().control.direction;
+      return tempX * Math.cos( tempAngle ) + tempY * Math.sin( tempAngle );
    }
 
    public double yFromOrigin()
    {
-      return y - getCanvas().origin.y;
+      double tempX = x - getCanvas().origin.x;
+      double tempY = y - getCanvas().origin.y;
+      double tempAngle = getCanvas().control.direction;
+      return -tempX * Math.sin( tempAngle ) + tempY * Math.cos( tempAngle );
    }
    
    
@@ -94,6 +100,15 @@ class FlatlandPoint extends Point2D.Double
 
          retX = Qx1;
          retY = Pm * Qx1 + Pb;
+      }
+      else if( Qrise == 0 )
+      {
+         Pm = Prise / Prun;      // slope of segment P
+         
+         Pb = Py1 - Pm * Px1;    // y-intercept of segment P
+         
+         retX = ( Qy1 - Pb ) / Pm;
+         retY = Qy1;
       }
       else
       {
