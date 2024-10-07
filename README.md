@@ -1,6 +1,11 @@
 # Flatland
 
-<iframe src="http://player.vimeo.com/video/42809224" width="500" height="344" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
+
+
+https://github.com/user-attachments/assets/ca932a9a-b84e-4f81-941e-b7414197f127
+
+
+<a href="https://vimeo.com/video/42809224">On Vimeo</a>
 
 Edwin Abbott wrote Flatland: A Romance of Many Dimensions in 1884. It was satire, but also explored what it would be like to live in a 2D world--how would flat people experience a creature entering from a 3rd dimension, for example?
 
